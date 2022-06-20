@@ -16,7 +16,7 @@ from drf_yasg.utils import swagger_auto_schema
 
 from . import constants
 from .models import Product
-from .serializers import UserSerializer, LogInSerializer, ProductSerializer
+from .serializers import UserSerializer, LogInSerializer, ProductSerializer, TokenObtainPairResponseSerializer
 from .permissions import CustomPermission
 from .filters import ProductFilterSet
 from .pagination import DefaultPagination
@@ -29,6 +29,14 @@ class SignUpView(CreateAPIView):
 
 class LogInView(TokenObtainPairView):
     serializer_class = LogInSerializer
+
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: TokenObtainPairResponseSerializer,
+        }
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
 
 
 class ProductListView(ListCreateAPIView):

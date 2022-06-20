@@ -63,3 +63,14 @@ class ProductSerializer(serializers.ModelSerializer):
             "average_rating" "created_at",
             "updated_at",
         )
+
+
+class TokenObtainPairResponseSerializer(serializers.Serializer):
+    access = serializers.CharField()
+    refresh = serializers.CharField()
+
+    def create(self, validated_data):
+        raise NotImplementedError()
+
+    def update(self, instance, validated_data):
+        raise NotImplementedError()

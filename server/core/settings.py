@@ -135,14 +135,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "products.User"
 
-
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
-    )
-}
-
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": datetime.timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=1),
@@ -153,11 +145,20 @@ REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": (
         "django_filters.rest_framework.DjangoFilterBackend",
         "rest_framework.filters.OrderingFilter",
-    )
+    ),
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ),
 }
 
-SWAGGER_SETTINGS = {"USE_SESSION_AUTH": False}
+# SWAGGER_SETTINGS = {"USE_SESSION_AUTH": False}
 
+SWAGGER_SETTINGS = {
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"},
+    }
+}
 ES_HOSTS = os.environ.get("ES_HOSTS", ["http://localhost:9200"])
 
 ES_CONNECTION = connections.create_connection(hosts=ES_HOSTS)
