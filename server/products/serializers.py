@@ -54,10 +54,12 @@ class ProductSerializer(serializers.ModelSerializer):
             "name",
             "price",
             "rating",
+            "average_rating",
+            "created_at",
             "updated_at",
         )
         read_only_fields = (
             "id",
-            "created_at",
+            "average_rating" "created_at",
             "updated_at",
         )

@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 import os
 import datetime
 
+from elasticsearch_dsl import connections
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.postgres",
     "rest_framework",
     "django_filters",
     "drf_yasg",
@@ -154,3 +157,7 @@ REST_FRAMEWORK = {
 }
 
 SWAGGER_SETTINGS = {"USE_SESSION_AUTH": False}
+
+ES_HOSTS = os.environ.get("ES_HOSTS", ["http://localhost:9200"])
+
+ES_CONNECTION = connections.create_connection(hosts=ES_HOSTS)

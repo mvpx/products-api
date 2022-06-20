@@ -5,12 +5,16 @@ from rest_framework.generics import ListCreateAPIView, CreateAPIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
 
+from elasticsearch_dsl import Search
+from elasticsearch_dsl.query import Match, Term
+
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
+from . import constants
 from .models import Product
 from .serializers import UserSerializer, LogInSerializer, ProductSerializer
 from .permissions import CustomPermission
@@ -33,7 +37,11 @@ class ProductListView(ListCreateAPIView):
     serializer_class = ProductSerializer
     filterset_class = ProductFilterSet
     pagination_class = DefaultPagination
-    ordering_fields = ["id"]
+    ordering_fields = (
+        "id",
+        "price",
+        "rating",
+    )
 
     @swagger_auto_schema(
         request_body=openapi.Schema(
@@ -115,3 +123,40 @@ class ProductUpdateView(APIView):
             product.users_rated.add(request.user)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ESProductsView(APIView):
+    def get(self, request, *args, **kwargs):
+        price = self.request.query_params.get("price")
+        rating = self.request.query_params.get("rating")
+
+        query = kwargs["query"]
+
+        search = Search(index=constants.ES_INDEX)
+        q = {"should": [], "filter": []}
+
+        if query:
+            q["should"] = [Match(name=query)]
+            q["minimum_should_match"] = 1
+
+        if price:
+            q["filter"].append(Term(price=price))
+        if rating:
+            q["filter"].append(Term(rating=rating))
+
+        response = search.query("bool", **q).params(size=100).execute()
+
+        if response.hits.total.value > 0:
+            return Response(
+                data=[
+                    {
+                        "id": hit.meta.id,
+                        "name": hit.name,
+                        "price": hit.price,
+                        "rating": hit.rating,
+                    }
+                    for hit in response
+                ]
+            )
+        else:
+            return Response(data=[])

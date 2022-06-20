@@ -155,3 +155,10 @@ def test_remove_product_incorrect_id(client, django_user_model):
     client.force_login(user)
     resp = client.delete("/api/products/99/")
     assert resp.status_code == 404
+
+
+@pytest.mark.django_db
+def test_query_matches_products_name(client):
+    resp = client.get("/api/es-products/Paper/")
+    assert 6 == len(resp.data)
+    assert "668" == resp.data[0]["id"]
