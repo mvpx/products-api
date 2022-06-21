@@ -1,9 +1,8 @@
 from django.urls import path
-
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from .views import SignUpView, LogInView, ProductListView, ProductDetailView, ProductUpdateView, ESProductsView
-
+from .views import (ESProductsView, LogInView, ProductDetailView,
+                    ProductListView, ProductUpdateView, SignUpView)
 
 urlpatterns = [
     path("api/sign_up/", SignUpView.as_view(), name="sign_up"),

@@ -1,17 +1,12 @@
-import pathlib
 import json
+import pathlib
 import uuid
 
 import pytest
-
 from django.conf import settings
-
 from elasticsearch_dsl import connections
 
 from products.constants import ES_MAPPING
-from products.models import Product
-
-
 from products.models import Product
 
 

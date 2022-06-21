@@ -1,13 +1,8 @@
-import decimal
-
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
-
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from .models import Product
-
-from django.contrib.auth import get_user_model
-from rest_framework import serializers
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -47,6 +42,9 @@ class LogInSerializer(TokenObtainPairSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(required=True)
+    price = serializers.CharField(required=True)
+
     class Meta:
         model = Product
         fields = (
@@ -60,7 +58,30 @@ class ProductSerializer(serializers.ModelSerializer):
         )
         read_only_fields = (
             "id",
-            "average_rating" "created_at",
+            "average_rating",
+            "created_at",
+            "updated_at",
+        )
+
+
+class ProductRatingSerializer(serializers.ModelSerializer):
+    rating = serializers.CharField(required=True)
+
+    class Meta:
+        model = Product
+        fields = (
+            "id",
+            "name",
+            "price",
+            "rating",
+            "average_rating",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = (
+            "id",
+            "average_rating",
+            "created_at",
             "updated_at",
         )
 
