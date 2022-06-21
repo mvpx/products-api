@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand
-
-from elasticsearch_dsl import connections
 from elasticsearch.helpers import bulk
+from elasticsearch_dsl import connections
 
 from products.constants import ES_INDEX, ES_MAPPING
 from products.models import Product

@@ -1,14 +1,12 @@
-import json
 import base64
+import json
 
 import pytest
-
 from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.reverse import reverse
 
 from products.models import Product
-
 
 PASSWORD = "pAssw0rd!"
 
@@ -95,7 +93,7 @@ def test_add_product_invalid_json_keys(client, django_user_model):
 
     resp = client.post(
         "/api/products/",
-        {"name": "Nokia 3310", "price": "200.20", "comment": 3.1},
+        {"name": "Nokia 3310"},
         content_type="application/json",
     )
     assert resp.status_code == 400
@@ -117,7 +115,7 @@ def test_get_single_product(client, add_product, django_user_model):
 
 
 def test_get_single_product_incorrect_id(client):
-    resp = client.get(f"/api/products/foo/")
+    resp = client.get("/api/products/foo/")
     assert resp.status_code == 404
 
 
@@ -125,7 +123,7 @@ def test_get_single_product_incorrect_id(client):
 def test_get_all_products(client, add_product):
     add_product(name="Nokia 3310", price="200.20", rating=3.1)
     add_product(name="Nokia 5210", price="100.20", rating=4.1)
-    resp = client.get(f"/api/products/")
+    resp = client.get("/api/products/")
     assert resp.status_code == 200
     assert resp.data["count"] == 2
 
@@ -146,15 +144,68 @@ def test_remove_product(client, add_product, django_user_model):
 
     resp_three = client.get("/api/products/")
     assert resp_three.status_code == 200
-    assert len(resp_three.data) == 0
+    assert len(resp_three.data["results"]) == 0
 
 
 @pytest.mark.django_db
 def test_remove_product_incorrect_id(client, django_user_model):
     user = django_user_model.objects.create_user(username="test", password=PASSWORD)
     client.force_login(user)
-    resp = client.delete("/api/products/99/")
+    resp = client.delete("/api/products/123542323/")
     assert resp.status_code == 404
+
+
+@pytest.mark.django_db
+def test_update_product(client, add_product, django_user_model):
+    user = django_user_model.objects.create_user(username="test", password=PASSWORD)
+    client.force_login(user)
+
+    product = add_product(name="Nokia 3310", price="200.20", rating=3.1)
+
+    resp = client.put(
+        f"/api/products/{product.id}/",
+        {"name": "Lemon Pie", "price": "20.5", "rating": 4},
+        content_type="application/json",
+    )
+    assert resp.status_code == 200
+    assert resp.data["name"] == "Lemon Pie"
+    assert resp.data["rating"] == 4
+
+    resp_two = client.get(f"/api/products/{product.id}/")
+    assert resp_two.status_code == 200
+    assert resp_two.data["name"] == "Lemon Pie"
+    assert resp.data["rating"] == 4
+
+
+@pytest.mark.django_db
+def test_update_product_incorrect_id(client, django_user_model):
+    user = django_user_model.objects.create_user(username="test", password=PASSWORD)
+    client.force_login(user)
+    resp = client.put(f"/api/products/123542323/")
+    assert resp.status_code == 404
+
+
+@pytest.mark.django_db
+def test_update_product_invalid_json(client, add_product, django_user_model):
+    user = django_user_model.objects.create_user(username="test", password=PASSWORD)
+    client.force_login(user)
+    product = add_product(name="Nokia 3310", price="200.20", rating=3.1)
+    resp = client.put(f"/api/products/{product.id}/", {}, content_type="application/json")
+    assert resp.status_code == 400
+
+
+@pytest.mark.django_db
+def test_update_product_invalid_json_keys(client, add_product, django_user_model):
+    user = django_user_model.objects.create_user(username="test", password=PASSWORD)
+    client.force_login(user)
+    product = add_product(name="Nokia 3310", price="200.20", rating=3.1)
+
+    resp = client.put(
+        f"/api/products/{product.id}/",
+        {"name": "Lemon Pie", "test": "20.5", "rating": 4},
+        content_type="application/json",
+    )
+    assert resp.status_code == 400
 
 
 @pytest.mark.django_db

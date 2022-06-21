@@ -36,8 +36,11 @@ $ curl http://localhost:9200/product/_count?pretty
   }
 }
 ```
-
-## **4. Authenticate**
+## **4. Check if tests are passing**
+```
+$ docker-compose exec server pytest
+```
+## **5. Authenticate**
 ### **Sign up**
 
 ![sign_up](assets/images/sign_up.png)
@@ -48,4 +51,4 @@ $ curl http://localhost:9200/product/_count?pretty
 ### Write `Bearer` into the value field and right after paste the access_token value.
 ![authorize](assets/images/authorize.png)
 
-## **5. Play with the API**
+## **6. Play with the API**

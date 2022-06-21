@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
 
 from core.models import TimeStampedModel
 
@@ -17,7 +17,9 @@ class Product(TimeStampedModel):
 
     @property
     def average_rating(self):
-        return round(Product.objects.aggregate(models.Avg("rating"))["rating__avg"], 1)
+        rating_average = Product.objects.aggregate(models.Avg("rating"))["rating__avg"]
+        if rating_average:
+            return round(rating_average, 1)
 
     def __str__(self):
         return f"{self.name}"

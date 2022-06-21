@@ -1,25 +1,27 @@
 from django.contrib.auth import get_user_model
 from django.http import Http404
-from rest_framework.views import APIView
-from rest_framework.generics import ListCreateAPIView, CreateAPIView
-from rest_framework.response import Response
-from rest_framework import status, permissions
-
-from elasticsearch_dsl import Search
-from elasticsearch_dsl.query import Match, Term
-
-from rest_framework_simplejwt.views import TokenObtainPairView
-
-
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from elasticsearch_dsl import Search
+from elasticsearch_dsl.query import Match, Term
+from rest_framework import permissions, status
+from rest_framework.generics import CreateAPIView, ListCreateAPIView
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from . import constants
-from .models import Product
-from .serializers import UserSerializer, LogInSerializer, ProductSerializer, TokenObtainPairResponseSerializer
-from .permissions import CustomPermission
 from .filters import ProductFilterSet
+from .models import Product
 from .pagination import DefaultPagination
+from .permissions import CustomPermission
+from .serializers import (
+    LogInSerializer,
+    ProductSerializer,
+    ProductRatingSerializer,
+    TokenObtainPairResponseSerializer,
+    UserSerializer,
+)
 
 
 class SignUpView(CreateAPIView):
@@ -123,7 +125,7 @@ class ProductUpdateView(APIView):
     )
     def patch(self, request, pk, format=None):
         product = self.get_object(pk)
-        serializer = ProductSerializer(product, data=request.data)
+        serializer = ProductRatingSerializer(product, data=request.data)
         if serializer.is_valid():
             if product.users_rated.filter(id=request.user.id):
                 return Response(serializer.errors, status=status.HTTP_403_FORBIDDEN)
