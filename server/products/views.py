@@ -59,7 +59,7 @@ class ProductListView(ListCreateAPIView):
             properties={
                 "name": openapi.Schema(type=openapi.TYPE_STRING),
                 "price": openapi.Schema(type=openapi.TYPE_STRING),
-                "rating": openapi.Schema(type=openapi.TYPE_STRING),
+                "rating": openapi.Schema(type=openapi.TYPE_NUMBER),
             },
         )
     )

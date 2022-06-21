@@ -85,6 +85,11 @@ class ProductRatingSerializer(serializers.ModelSerializer):
             "updated_at",
         )
 
+    def validate_rating(self, value):
+        if float(value) < 0 or float(value) > 5:
+            raise serializers.ValidationError("Rating has to be between 0 and 5.")
+        return value
+
 
 class TokenObtainPairResponseSerializer(serializers.Serializer):
     access = serializers.CharField()
